@@ -1,17 +1,19 @@
 const express = require('express');
 const env = require('dotenv');
 const formidable = require('formidable');
-const bodyParser = require('body-parser');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const port = 3000;
-const form = formidable;
 
-// app.get('/', (req, res) => {
-//   res.send('Hello World!')
-// })
-app.use(bodyParser.json())
-    .use(bodyParser.urlencoded());
+const uploadDirectory = path.join(__dirname, 'uploads');
+
+
+if (!fs.existsSync(uploadDirectory)) {
+  fs.mkdirSync(uploadDirectory);
+}
+
 
 app.get('/', (req, res) => {
   res.send(`
@@ -26,13 +28,28 @@ app.get('/', (req, res) => {
 
 app.post('/api/upload', (req, res, next) => {
   
+  const form = new formidable.IncomingForm();
 
   form.parse(req, (err, fields, files) => {
     if (err) {
-      next(err);
-      return;
+      
+      return res.status(500).send('An error occurred while parsing the form data.');
     }
-    res.json({ fields, files });
+
+    const file = files.uploadedFile;
+
+    
+    const oldPath = file.path;
+    const newPath = path.join(uploadDirectory, file.name);
+
+    fs.rename(oldPath, newPath, (err) => {
+      if (err) {
+        return res.status(500).send('An error occurred while saving the file.');
+      }
+
+    return res.status(200).send('File uploaded and stored successfully.');
+    
+    });
   });
 });
 
