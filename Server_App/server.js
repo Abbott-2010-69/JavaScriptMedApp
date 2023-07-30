@@ -1,58 +1,39 @@
 const express = require('express');
-const env = require('dotenv');
-const formidable = require('formidable');
+const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-
 const app = express();
-const port = 3000;
 
-const uploadDirectory = path.join(__dirname, 'uploads');
+// Set up the storage for uploaded files
+const storage = multer.diskStorage({
+  destination: './Server_App/uploads/',
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const fileExtension = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
+  }
+});
 
+// Create the multer upload middleware
+const upload = multer({ storage });
 
-if (!fs.existsSync(uploadDirectory)) {
-  fs.mkdirSync(uploadDirectory);
-}
-
-
+// Serve the index.html file
 app.get('/', (req, res) => {
-  res.send(`
-    <h2>File Upload Medis</h2>
-    <form action="/api/upload" enctype="multipart/form-data" method="post">
-      <div>Text field title: <input type="text" name="title" /></div>
-      <div>File: <input type="file" name="someExpressFiles" multiple="multiple" /></div>
-      <input type="submit" value="Upload" />
-    </form>
-  `);
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.post('/api/upload', (req, res, next) => {
-  
-  const form = new formidable.IncomingForm();
+// Handle file uploads
+app.post('/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.json({ message: 'No file uploaded.' });
+  }
 
-  form.parse(req, (err, fields, files) => {
-    if (err) {
-      
-      return res.status(500).send('An error occurred while parsing the form data.');
-    }
-
-    const file = files.uploadedFile;
-
-    
-    const oldPath = file.path;
-    const newPath = path.join(uploadDirectory, file.name);
-
-    fs.rename(oldPath, newPath, (err) => {
-      if (err) {
-        return res.status(500).send('An error occurred while saving the file.');
-      }
-
-    return res.status(200).send('File uploaded and stored successfully.');
-    
-    });
-  });
+  // Do further processing with the uploaded file if needed
+  // For example, you can save the file path to a database, etc.
+  console.log("file uploaded");
+  return res.json({ message: 'File uploaded successfully.' });
 });
 
+const port = 3000;
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Server is running on http://localhost:${port}`);
+});

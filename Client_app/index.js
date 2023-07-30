@@ -12,7 +12,7 @@ function uploadFile() {
     formData.append('file', file);
   
     // Make the AJAX request using the Fetch API
-    fetch('http://localhost:3000/api/upload', {
+    fetch('http://localhost:3000/upload', {
       method: 'POST',
       body: formData
     })
