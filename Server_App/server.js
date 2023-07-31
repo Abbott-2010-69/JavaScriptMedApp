@@ -7,7 +7,7 @@ const app = express();
 
 // Set up the storage for uploaded files
 const storage = multer.diskStorage({
-  destination: './Server_App/uploads/',
+  destination: `./Server_App/${config.UPLOAD_DIR}`,
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const fileExtension = path.extname(file.originalname);
