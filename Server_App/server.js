@@ -1,6 +1,8 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const config =  require('./config.js');
+
 const app = express();
 
 // Set up the storage for uploaded files
@@ -18,7 +20,7 @@ const upload = multer({ storage });
 
 // Serve the index.html file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.send("OK");
 });
 
 // Handle file uploads
