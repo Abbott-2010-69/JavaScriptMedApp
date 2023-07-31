@@ -11,7 +11,7 @@ function uploadFile() {
     const formData = new FormData();
     formData.append('file', file);
   
-    // Make the AJAX request using the Fetch API
+    // Make the request using the Fetch API
     fetch('http://localhost:3000/upload', {
       method: 'POST',
       body: formData
@@ -28,6 +28,6 @@ function uploadFile() {
   
   function showMessage(message) {
     const messageDiv = document.getElementById('message');
-    messageDiv.textContent = message;
+    console.log(message);
   }
   
